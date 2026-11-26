@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HNDIT1012 Practicals Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday learning tool for HNDIT students, clear and practical
+   IDEA the Visual Studio WinForms designer: each practical runs as a live form window next to its C# code
+   PICTURE the working form window itself (calculator, ball, paint canvas, coordinate plane)
+   COLOUR white ground, ink #111827, cobalt #1240e0 strip and accents, pale #eef2ff zones, WinForms grey #f0f0f0
+   TYPE Space Grotesk headings + Inter body + JetBrains Mono code
+   LAYOUT cobalt top strip; sidebar of practicals; form window left, code right; stacks below 1000px */
+:root{color-scheme:light;--bg:#fff;--ink:#111827;--muted:#556070;--blue:#1240e0;--blue2:#0b2fae;--pale:#eef2ff;--line:#d9dee8;--form:#f0f0f0;--ok:#0a7a3e;--bad:#c4162a;--hl:#fff4c2}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.1;letter-spacing:-.02em;margin:0}
+h1{font-size:clamp(28px,4vw,40px);text-wrap:balance}
+h2{font-size:22px;margin:28px 0 10px}
+h3{font-size:17px;margin:18px 0 8px}
+p{margin:0 0 10px}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em}
+p code,li code,td code{background:var(--pale);padding:1px 5px;border-radius:4px}
+a{color:var(--blue)}
+.top{background:var(--blue);color:#fff;padding:12px max(3vw,16px);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top b{font-family:"Space Grotesk";font-size:20px}
+.top span{opacity:.85;font-size:14px}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100vh - 52px)}
+nav{border-right:1px solid var(--line);padding:16px 10px;background:#fafbff}
+nav a{display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:15px;min-height:40px}
+nav a small{color:var(--muted);font-size:13px;margin-left:auto}
+nav a:hover{background:var(--pale)}
+nav a.on{background:var(--blue);color:#fff}
+nav a.on small{color:#dbe3ff}
+nav .sep{height:1px;background:var(--line);margin:10px 6px}
+main{padding:24px max(3vw,16px) 64px;max-width:1320px}
+.lead{color:var(--muted);max-width:70ch;margin-top:8px}
+.split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;margin-top:20px;align-items:start}
+.win{border:1px solid #9aa6bf;border-radius:8px;overflow:hidden;box-shadow:0 2px 0 #e3e7f0;background:var(--form)}
+.tb{display:flex;align-items:center;gap:8px;background:linear-gradient(#fff,#e9eef9);border-bottom:1px solid #b9c3d8;padding:6px 10px;font-size:13px}
+.tb i{width:14px;height:14px;border-radius:3px;background:var(--blue);display:inline-block}
+.tb .ctl{margin-left:auto;display:flex;gap:4px}
+.tb .ctl em{width:26px;height:18px;border:1px solid #b9c3d8;border-radius:3px;background:#fff}
+.tb .ctl em:last-child{background:#e8445a;border-color:#c32}
+.wb{padding:16px;font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.row label{min-width:86px}
+input[type=text],input[type=number],select{font:16px Inter,sans-serif;padding:6px 8px;border:1px solid #8e99ad;border-radius:3px;background:#fff;color:var(--ink);min-height:36px}
+input[type=text]:focus,input[type=number]:focus,select:focus,button:focus-visible,canvas:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+button{font:500 14px Inter,sans-serif;min-height:36px;padding:6px 14px;border:1px solid #8e99ad;border-radius:3px;background:linear-gradient(#fdfdfd,#e5e5e5);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--blue);background:#e9efff}
+button:active{background:#d6e0ff}
+button.pri{background:var(--blue);color:#fff;border-color:var(--blue2)}
+input[type=range]{accent-color:var(--blue);width:180px;min-height:30px}
+.rtb{background:#fff;border:1px solid #8e99ad;min-height:90px;padding:8px;font:13px/1.5 "JetBrains Mono",monospace;white-space:pre;tab-size:8;overflow:auto;margin:0}
+.lst{background:#fff;border:1px solid #8e99ad;min-height:90px;padding:4px 0;font-size:14px;overflow:auto;max-height:180px}
+.lst div{padding:1px 8px}
+.code{background:#fbfcff;border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:620px}
+.code .hd{position:sticky;top:0;background:var(--pale);border-bottom:1px solid var(--line);padding:6px 12px;font-size:13px;color:var(--muted)}
+.code pre{margin:0;padding:8px 0;font:13px/1.6 "JetBrains Mono",monospace}
+.code .ln{display:block;padding:0 12px 0 0;white-space:pre}
+.code .ln::before{content:attr(data-n);display:inline-block;width:38px;text-align:right;padding-right:12px;color:#9aa3b5}
+.code .ln.hl{background:var(--hl);box-shadow:inset 3px 0 var(--blue)}
+.k{color:#1240e0;font-weight:600}.s{color:#a31515}.c{color:#2f7d32;font-style:italic}.n{color:#9a3dbd}
+.out{margin-top:12px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:6px;padding:10px 14px;font-size:15px}
+.out.err{border-left-color:var(--bad)}
+.notes{margin-top:8px}
+.notes ul{padding-left:20px;margin:6px 0}
+.notes li{margin:5px 0}
+.tbl{overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--pale);font-weight:600}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+details{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:#fff}
+summary{cursor:pointer;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;min-height:34px}
+.chip{background:#fff;border:1px solid #8e99ad;border-radius:4px;padding:4px 10px;font:13px "JetBrains Mono",monospace;animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.cells{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.cell{border:1px solid #8e99ad;background:#fff;border-radius:4px;padding:6px 10px;text-align:center;min-width:72px}
+.cell small{display:block;color:var(--muted);font-size:12px}
+.cell.mv{background:var(--hl);border-color:#d6a700}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+fieldset{border:1px solid #b8c0cf;border-radius:4px;padding:6px 10px 10px;margin:0}
+legend{font-size:13px;padding:0 4px}
+.rad{display:flex;align-items:center;gap:6px;min-height:30px}
+.fig{position:relative;width:100%}
+canvas{display:block;width:100%;background:#fff;border:1px solid #b8c0cf;touch-action:none}
+.swatch{display:inline-block;width:110px;padding:6px;border:1px solid #8e99ad;text-align:center;cursor:pointer;font-size:13px;color:#fff;border-radius:3px}
+.mb{position:fixed;inset:0;background:rgba(17,24,39,.28);display:none;align-items:center;justify-content:center;z-index:9;padding:16px}
+.mb.on{display:flex}
+.mb .win{width:min(420px,100%);background:#fff}
+.mb .wb{display:flex;flex-direction:column;gap:14px}
+.mb .wb div{white-space:pre-wrap}
+.qz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0;background:#fff}
+.qz .opts{display:grid;gap:6px;margin-top:8px}
+.qz button{text-align:left;background:#fff}
+.qz button.right{background:#e3f6ea;border-color:var(--ok)}
+.qz button.wrong{background:#fde8ea;border-color:var(--bad)}
+.qz .why{margin-top:8px;font-size:14px;color:var(--muted)}
+.score{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:10px 0;font-weight:600;z-index:2}
+.bar{height:8px;background:var(--pale);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--blue);transition:width .3s}
+.map td a{font-weight:600}
+.status{font:13px "JetBrains Mono",monospace;color:var(--muted);margin-top:6px}
+@media(max-width:1000px){.split{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){.shell{grid-template-columns:minmax(0,1fr)}nav{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow-x:auto;gap:4px;padding:8px}nav a{white-space:nowrap;flex:none}nav a small,nav .sep{display:none}}
+@media(max-width:600px){#p8g{grid-template-columns:minmax(0,1fr)!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top"><b>HNDIT1012 Visual Application Programming</b><span>Practicals 1–9 and Week 8 Graphics · interactive lab</span></div>
+<div class="shell">
+<nav id="nav"></nav>
+<main id="main"></main>
+</div>
+<div class="mb" id="mb"><div class="win"><div class="tb"><i></i><span id="mbt">Message</span><div class="ctl"><em></em></div></div><div class="wb"><div id="mbx"></div><button class="pri" id="mbok" style="align-self:flex-end;min-width:80px">OK</button></div></div></div>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KW=/\b(public|private|void|int|string|String|if|else|for|foreach|while|do|switch|case|break|default|new|return|using|namespace|class|partial|var|bool|true|false|this|char|in)\b/;
+function hlLine(src){
+  if(/^\s*(\/\*|\*)/.test(src)) return `<span class="c">${esc(src)}</span>`;
+  const re=new RegExp(String.raw`(\/\/.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])')|`+KW.source+String.raw`|\b(\d+)\b`,'g');
+  let out='',last=0;
+  src.replace(re,(m,c,s,k,n,i)=>{out+=esc(src.slice(last,i));out+=`<span class="${c?'c':s?'s':k?'k':'n'}">${esc(m)}</span>`;last=i+m.length;return m});
+  return out+esc(src.slice(last));
+}
+function codeBox(id,title,src){
+  return `<div class="code" id="code-${id}"><div class="hd">${esc(title)}</div><pre>${src.split('\n').map((l,i)=>`<span class="ln" data-n="${i+1}">${hlLine(l)||' '}</span>`).join('')}</pre></div>`;
+}
+function flash(id,keys){
+  const box=$('#code-'+id); if(!box) return;
+  const lines=$$('.ln',box); lines.forEach(l=>l.classList.remove('hl'));
+  let first=null;
+  keys.forEach(k=>lines.forEach(l=>{if(l.textContent.includes(k)){l.classList.add('hl');first=first||l}}));
+  if(first){const top=first.offsetTop-box.clientHeight/3;box.scrollTo({top,behavior:'smooth'})}
+}
+const mb=$('#mb');let mbRes=null;
+function msg(text,title='Message'){ $('#mbt').textContent=title;$('#mbx').textContent=text;mb.classList.add('on');$('#mbok').focus();return new Promise(r=>mbRes=r)}
+$('#mbok').onclick=()=>{mb.classList.remove('on');mbRes&&mbRes()};
+function parseInt32(t){ if(t==null) throw 'ArgumentNullException'; if(!/^\s*[+-]?\d+\s*$/.test(t)) throw 'FormatException: Input string was not in a correct format.'; const v=Number(t); if(v>2147483647||v<-2147483648) throw 'OverflowException: Value was either too large or too small for an Int32.'; return v}
+const win=(title,body,cls='')=>`<div class="win ${cls}"><div class="tb"><i></i><span>${esc(title)}</span><div class="ctl"><em></em><em></em><em></em></div></div><div class="wb">${body}</div></div>`;
+const out=(id,t='Interact with the form to see what the code does.')=>`<div class="out" id="${id}">${t}</div>`;
+function say(id,html,err){const e=$('#'+id);e.innerHTML=html;e.classList.toggle('err',!!err)}
+const selfTest=qs=>`<h3>Self-check</h3>`+qs.map(([q,a])=>`<details><summary>${q}</summary><p style="margin-top:8px">${a}</p></details>`).join('');
+
+/* ---------- code listings ---------- */
+const C={};
+C.p1=String.raw`int count;                     // field: survives between clicks
+
+public Calculator()
+{
+    InitializeComponent();
+    count = 0;
+}
+
+private void btnOK_Click(object sender, EventArgs e)
+{
+    count++;
+    txtName.Text = "Visual Application Programming " + count;
+}
+
+private void btnAdd_Click(object sender, EventArgs e)
+{
+    txtName.Text = (Int32.Parse(txtNum1.Text) +
+                    Int32.Parse(txtNum2.Text)).ToString();
+}
+
+private void btnQuestions_Click(object sender, EventArgs e)
+{
+    int a, b, x;
+    a = Int32.Parse(txtNum1.Text);
+    b = Int32.Parse(txtNum2.Text);
+    x = a << 2;                    // left shift by 2
+    txtResult.Text = x.ToString();
+}`;
+C.p2=String.raw`private void Week3_MouseMove(object sender, MouseEventArgs e)
+{
+    String s = "Computer";
+    lblMousePos.Text = String.Format("{0} is an information processing machine", s);
+}
+
+private void Week3_MouseDown(object sender, MouseEventArgs e)
+{
+    if (e.Button == MouseButtons.Left)
+        MessageBox.Show("Left Mouse Button");
+    else if (e.Button == MouseButtons.Right)
+        MessageBox.Show("Right Mouse Button");
+    else
+        MessageBox.Show("Middle Mouse Button");
+}
+
+private void textBox1_KeyDown(object sender, KeyEventArgs e)
+{
+    if (e.Modifiers == Keys.Control)
+        textBox2.Focus();
+}
+
+private void timer1_Tick(object sender, EventArgs e)
+{
+    textBox2.Visible = !textBox2.Visible;
+}`;
+C.p3=String.raw`private void button1_Click(object sender, EventArgs e)
+{
+    //Example for escape characters
+    richTextBox1.Text =
+      "Name\t\tMobile\t\tAge\n\"Kumar\"\t\t07788995\t23\nRavi\t\t0785432\t\t24";
+
+    int a = Convert.ToInt32(txtAge.Text);
+    string s = (a < 13) ? "Child" : "Adult";
+    txtAge.Text = s;
+}`;
+C.p4=String.raw`string HD = "F", VD = "D";   // F/B = forward/backward, U/D = up/down
+
+private void speedcontrol_Scroll(object sender, EventArgs e)
+{
+    timer1.Interval = 305 - speedcontrol.Value;
+}
+
+private void timer1_Tick(object sender, EventArgs e)
+{
+    if (HD == "F")
+    {
+        if ((ball.Width + ball.Left + 10) > this.Width)
+        { ball.Left = this.Width - ball.Width; HD = "B"; }
+        else ball.Left += 10;
+    }
+    else
+    {
+        if (ball.Left - 10 < 0)
+        { ball.Left = 0; HD = "F"; }
+        else ball.Left -= 10;
+    }
+    if (VD == "D")
+    {
+        if ((ball.Top + ball.Height + 10) > this.Height)
+        { ball.Top = this.Height - ball.Height; VD = "U"; }
+        else ball.Top += 10;
+    }
+    else
+    {
+        if (ball.Top - 10 < 0)
+        { ball.Top = 0; VD = "D"; }
+        else ball.Top -= 10;
+    }
+}`;
+C.p5=String.raw`int dotcount = 0;
+int basenum = 2;
+
+private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+{
+    switch (comboBox1.SelectedIndex)
+    {
+        case 0: textBox1.Text = "Monday"; break;
+        case 1: textBox1.Text = "Tuesday"; break;
+        case 2: textBox1.Text = "Wednesday"; break;
+        case 3: textBox1.Text = "Thursday"; break;
+        case 4: textBox1.Text = "Friday"; break;
+        case 5: textBox1.Text = "Saturday"; break;
+        case 6: textBox1.Text = "Sunday"; break;
+        default: textBox1.Text = "Invalid Index"; break;
+    }
+}
+
+private void button1_Click(object sender, EventArgs e)
+{
+    for (int i = 10; i > 0; i--)
+        MessageBox.Show(i.ToString());
+    MessageBox.Show("The End");
+}
+
+private void btnWhile_Click(object sender, EventArgs e)
+{
+    int i = 0;
+    do
+    {
+        MessageBox.Show((i++).ToString());
+    } while (i < 10);
+}
+
+private void btnDtoB_Click(object sender, EventArgs e)
+{
+    int d = Convert.ToInt32(txtDecimal.Text);
+    string b = "";
+    int bit;
+    while (d > 0)
+    {
+        bit = d % basenum;   // remainder
+        d = d / basenum;     // integer division
+        b = bit + b;
+    }
+    txtBinary.Text = b;
+}
+
+private void btnBintoDec_Click(object sender, EventArgs e)
+{
+    string b = txtBinary.Text;
+    int d = 0, i = b.Length, j = 0;
+    while (i > 0)
+    {
+        d += b.Substring(j++, 1).Equals("1") ? (int)Math.Pow(2, i - 1) : 0;
+        i--;
+    }
+    txtDecimal.Text = d.ToString();
+}
+
+private void textBox2_KeyPress(object sender, KeyPressEventArgs e)
+{
+    if (((e.KeyChar >= 'a') && (e.KeyChar <= 'z')) ||
+        ((e.KeyChar >= 'A') && (e.KeyChar <= 'Z')) ||
+        (e.KeyChar == (char)8) || (e.KeyChar == ' '))
+    {
+        if ((e.KeyChar >= 'a') && (e.KeyChar <= 'z'))
+            e.KeyChar = (char)((int)e.KeyChar - 32); // to uppercase
+    }
+    else
+    {
+        e.KeyChar = (char)0;  // Null character
+        MessageBox.Show("Invalid Character Pressed");
+    }
+}
+
+private void textBox3_KeyPress(object sender, KeyPressEventArgs e)
+{
+    if (((e.KeyChar >= '0') && (e.KeyChar <= '9')) |
+        (e.KeyChar == (char)8) || (e.KeyChar == '.'))
+    {
+        dotcount += (e.KeyChar == '.') ? 1 : 0;
+        if (dotcount > 1)
+        {
+            e.KeyChar = (char)0;
+            MessageBox.Show("More than one decimal will not be accepted");
+            dotcount--;
+        }
+        dotcount = (textBox3.Text.IndexOf('.') == -1) ? 0 : dotcount;
+    }
+    else
+    {
+        e.KeyChar = (char)0;
+        MessageBox.Show("Invalid Character Pressed");
+    }
+}
+
+private void DToB_CheckedChanged(object sender, EventArgs e)
+{
+    if (DToB.Checked)
+    {
+        labelResult.Text = "Binary Number";
+        btnDtoB.Text = "Convert to Binary";
+        basenum = 2;
+        numericUpDown1.Visible = false;
+    }
+}
+
+private void DtoO_CheckedChanged(object sender, EventArgs e)
+{
+    if (DtoO.Checked)
+    {
+        labelResult.Text = "Octal Number";
+        btnDtoB.Text = "Convert To Octal";
+        basenum = 8;
+        numericUpDown1.Visible = false;
+    }
+}
+
+private void radioOther_CheckedChanged(object sender, EventArgs e)
+{
+    if (radioOther.Checked)
+        numericUpDown1.Visible = true;
+}`;
+C.p6=String.raw`using System;   // needed for Array
+using System.Windows.Forms;
+
+private void button1_Click(object sender, EventArgs e)
+{
+    string[] cars = { "Volvo", "BMW", "Toyota", "Mazda", "Suzuki" };
+    Array.Sort(cars);
+    Array.Reverse(cars, 0, 2);
+    comboBox1.Items.AddRange(cars);
+}`;
+C.p7=String.raw`private void button1_Click(object sender, EventArgs e)
+{
+    string myString = textBox1.Text;
+    string s = myString;
+    var x = myString.Split(' ');
+    listBox1.Items.AddRange(x);
+    myString = String.Format("First letter of your text is {0} and the last letter is {1}",
+                             myString[0], myString[myString.Length - 1]);
+    MessageBox.Show(myString);
+    for (int i = 0; i <= s.Length; i++)
+    {
+        richTextBox1.Text += s.Substring(0, i) + "\n";
+    }
+    MessageBox.Show(s.Replace("p", "b"));  // replace all "p" by "b"
+    MessageBox.Show(s.PadRight(20, '#'));
+    s = "Computer is an electronic information processing machine";
+    MessageBox.Show(s.IndexOf("is").ToString());      // from the beginning
+    MessageBox.Show(s.IndexOf("is", 15).ToString());  // from the 15th location
+}`;
+C.p8=String.raw`using System.Drawing;
+
+Graphics g;
+Pen pen;
+int size;
+
+public Week8()
+{
+    InitializeComponent();
+    g = this.CreateGraphics();
+    pen = new Pen(Color.Black);
+    size = 10;
+}
+
+private void label1_Click(object sender, EventArgs e)
+{
+    ColorDialog cdlg = new ColorDialog();
+    cdlg.ShowDialog();
+    label1.BackColor = cdlg.Color;
+    pen.Color = cdlg.Color;
+}
+
+private void trackBar1_Scroll(object sender, EventArgs e)
+{
+    size = trackBar1.Value;
+}
+
+private void trackBar2_Scroll(object sender, EventArgs e)   // Practical 9
+{
+    pen.Width = trackBar2.Value;
+}
+
+private void Week8_MouseClick(object sender, MouseEventArgs e)
+{
+    if (radioBLine.Checked)
+    {
+        int x1 = e.X - size / 2;
+        int y = e.Y;
+        int x2 = e.X + size / 2;
+        g.DrawLine(pen, x1, y, x2, y);
+    }
+    if (radioBCircle.Checked)
+    {
+        int x1 = e.X - size / 2;
+        int y1 = e.Y - size / 2;
+        if (e.Button == MouseButtons.Left)
+            g.DrawEllipse(pen, x1, y1, size, size);
+        else if (e.Button == MouseButtons.Right)
+            g.FillEllipse(new SolidBrush(pen.Color), x1, y1, size, size);
+    }
+    if (radioBSqure.Checked)
+    {
+        int x1 = e.X - size / 2;
+        int y1 = e.Y - size / 2;
+        if (e.Button == MouseButtons.Left)
+            g.DrawRectangle(pen, x1, y1, size, size);
+        else if (e.Button == MouseButtons.Right)
+            g.FillRectangle(new SolidBrush(pen.Color), x1, y1, size, size);
+    }
+}`;
+
+/* ---------- modules ---------- */
+const MODS=[];
+const add=m=>MODS.push(m);
+
+add({id:'home',nav:'Overview',tag:'',title:'Practicals lab: run every exercise in the browser',
+lead:'Each practical opens as a live form beside its C# code. Use the form and the code line that runs is highlighted. The full written study guide covers the same material in depth.',
+body:()=>`<div class="tbl map"><table><thead><tr><th>Practical</th><th>Topic</th><th>Controls</th><th>Key C#</th></tr></thead><tbody>
+${[['p1','1','Calculator: click events, parsing, shift','TextBox, Button','Int32.Parse, ToString, <<'],
+['p2','2','Mouse, keyboard and Timer events','Label, TextBox, Timer','MouseEventArgs, MouseButtons, Keys.Control'],
+['p3','3','Escape characters and ternary','RichTextBox, TextBox','\\t \\n \\", Convert.ToInt32, ?:'],
+['p4','4','Bouncing ball animation','PictureBox, Timer, TrackBar','Left, Top, Width, Interval'],
+['p5','5','switch, loops, base conversion, validation','ComboBox, RadioButton, NumericUpDown','switch, for, do…while, %, KeyPress'],
+['p6','6','Arrays and sorting','ComboBox, ListBox','Array.Sort, Array.Reverse, AddRange'],
+['p7','7','String methods','TextBox, ListBox, RichTextBox','Split, Substring, Replace, PadRight, IndexOf'],
+['w8','W8','Graphics, Pen, coordinates','Form (Paint)','DrawLine, DrawEllipse, DrawRectangle'],
+['p8','8–9','Paint program, pen width, fills','RadioButton, TrackBar, ColorDialog','CreateGraphics, SolidBrush, FillEllipse'],
+['quiz','Quiz','18 exam-style questions','',''],['ref','Cheat sheet','Every snippet in one table','','']].map(r=>`<tr><td><a href="#${r[0]}">${r[1]}</a></td><td>${r[2]}</td><td>${r[3]}</td><td>${esc(r[4])}</td></tr>`).join('')}
+</tbody></table></div>
+<h2>How to study with this lab</h2>
+<ul><li>Build each form in Visual Studio first, then compare its behaviour with the live version here.</li><li>Predict the result before clicking. The highlighted code line shows which statement produced it.</li><li>Finish with the quiz; aim for 15 out of 18 or better.</li></ul>`});
+
+add({id:'p1',nav:'Practical 1',tag:'Calculator',title:'Practical 1: Calculator, click events and type conversion',
+lead:'TextBox values are strings. Parse them to add, convert back with ToString(), and keep a counter in a field so it survives between clicks.',
+body:()=>`<div class="split"><div>${win('Calculator',`
+<div class="row"><label for="p1n">Name</label><input id="p1n" type="text" style="flex:1"><button id="p1ok">OK</button></div>
+<div class="row"><label for="p1a">Number 1</label><input id="p1a" type="text" value="28" size="8"></div>
+<div class="row"><label for="p1b">Number 2</label><input id="p1b" type="text" value="47" size="8"></div>
+<div class="row"><label for="p1r">Result</label><input id="p1r" type="text" size="8" readonly></div>
+<div class="row"><button id="p1add">Add</button><button id="p1q">Q And Ans</button></div>`)}${out('p1o')}<div class="status" id="p1s">count = 0</div></div>${codeBox('p1','Calculator.cs',C.p1)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li><b>Field vs local:</b> <code>count</code> is declared in the class, so it keeps growing. Declare it inside the handler and it always shows 1.</li>
+<li><b>Why parse?</b> <code>"28" + "47"</code> is <code>"2847"</code>; <code>28 + 47</code> is 75.</li>
+<li><b>Left shift:</b> <code>a &lt;&lt; n</code> multiplies by 2ⁿ. 28 is 11100₂, shifted twice is 1110000₂ = 112.</li>
+<li>Try typing letters in Number 1: <code>Int32.Parse</code> throws <code>FormatException</code>. <code>int.TryParse</code> avoids the crash.</li></ul>
+${selfTest([['What is 5 << 3?','40 (5 × 2³).'],['What is shown after pressing OK three times?','Visual Application Programming 3']])}</div>`,
+init(){let count=0;
+$('#p1ok').onclick=()=>{count++;$('#p1n').value='Visual Application Programming '+count;$('#p1s').textContent='count = '+count;flash('p1',['count++','txtName.Text = "Visual']);say('p1o',`<code>count</code> is now ${count}. The string <code>"Visual Application Programming " + count</code> converts the number to text automatically.`)};
+$('#p1add').onclick=()=>{flash('p1',['Int32.Parse(txtNum1.Text) +','Int32.Parse(txtNum2.Text)).ToString']);try{const a=parseInt32($('#p1a').value),b=parseInt32($('#p1b').value);$('#p1n').value=(a+b)|0;say('p1o',`Int32.Parse("${esc($('#p1a').value)}") + Int32.Parse("${esc($('#p1b').value)}") = ${(a+b)|0}. Without parsing, the text would join as "${esc($('#p1a').value+$('#p1b').value)}".`)}catch(x){say('p1o','Unhandled exception: System.'+x,1);msg('System.'+x,'Unhandled exception')}};
+$('#p1q').onclick=()=>{flash('p1',['a = Int32.Parse','x = a << 2','txtResult.Text']);try{const a=parseInt32($('#p1a').value);parseInt32($('#p1b').value);const x=a<<2;$('#p1r').value=x;say('p1o',`a = ${a} = <code>${(a>>>0).toString(2)}</code>₂<br>a &lt;&lt; 2 = <code>${(x>>>0).toString(2)}</code>₂ = <b>${x}</b> (same as ${a} × 4)`)}catch(x){say('p1o','Unhandled exception: System.'+x,1);msg('System.'+x,'Unhandled exception')}};}});
+
+add({id:'p2',nav:'Practical 2',tag:'Events',title:'Practical 2: Mouse, keyboard and Timer events',
+lead:'Move the mouse over the form, click with any button, press Ctrl in textBox1, and watch the Timer blink textBox2.',
+body:()=>`<div class="split"><div>${win('Week3',`
+<div id="p2f" style="background:#f0f0f0;min-height:150px;border:1px dashed #b8c0cf;padding:10px;user-select:none">
+<div style="display:inline-block;border:1px solid #8e99ad;background:#fff;padding:2px 8px;font-size:13px" id="p2l">Mouse Position</div>
+<p style="color:#556070;font-size:13px;margin-top:10px">Form surface: move, left-click, right-click or middle-click here.</p></div>
+<div class="row" style="margin-top:12px"><label for="p2t1">textBox1</label><input id="p2t1" type="text" placeholder="press Ctrl here"></div>
+<div class="row"><label for="p2t2">textBox2</label><input id="p2t2" type="text"></div>
+<div class="row"><label><input type="checkbox" id="p2en" checked> timer1.Enabled</label><label for="p2iv">Interval <b id="p2ivv">500</b> ms</label><input type="range" id="p2iv" min="100" max="1500" step="50" value="500"></div>
+<div class="row"><label><input type="checkbox" id="p2xy"> Show X and Y (exercise version)</label></div>`)}${out('p2o')}<div class="status" id="p2s">MouseMove: 0 · MouseDown: 0 · Tick: 0</div></div>${codeBox('p2','Week3.cs',C.p2)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li><code>MouseMove</code> fires many times per second; the counter shows it.</li>
+<li><code>e.Button</code> is a <code>MouseButtons</code> value: <code>Left</code>, <code>Right</code>, <code>Middle</code>.</li>
+<li><code>e.Modifiers == Keys.Control</code> is true while Ctrl is held; <code>Focus()</code> moves the cursor.</li>
+<li>The Timer raises <code>Tick</code> every <code>Interval</code> ms; <code>!Visible</code> flips it each time.</li>
+<li>Event order for a click: MouseDown → MouseUp → Click → MouseClick.</li></ul>
+${selfTest([['Write the MouseMove line that shows the pointer position.','<code>lblMousePos.Text = String.Format("X = {0}, Y = {1}", e.X, e.Y);</code>'],['Why can textBox2 sometimes not receive focus?','When the Timer has made it invisible, an invisible control cannot take focus.']])}</div>`,
+init(){let mm=0,md=0,tk=0,timer=null;const st=()=>$('#p2s').textContent=`MouseMove: ${mm} · MouseDown: ${md} · Tick: ${tk}`;const f=$('#p2f');
+f.addEventListener('mousemove',e=>{mm++;const r=f.getBoundingClientRect(),x=Math.round(e.clientX-r.left),y=Math.round(e.clientY-r.top);$('#p2l').textContent=$('#p2xy').checked?`X = ${x}, Y = ${y}`:'Computer is an information processing machine';if(mm%15==1)flash('p2',['lblMousePos.Text']);st()});
+f.addEventListener('contextmenu',e=>e.preventDefault());
+f.addEventListener('mousedown',e=>{e.preventDefault();md++;st();const b=e.button===0?'Left':e.button===2?'Right':'Middle';flash('p2',[`MessageBox.Show("${b} Mouse Button")`,b==='Left'?'e.Button == MouseButtons.Left':'else if']);say('p2o',`MouseDown with <code>e.Button == MouseButtons.${b}</code>`);msg(b+' Mouse Button')});
+$('#p2t1').addEventListener('keydown',e=>{if(e.ctrlKey&&!e.shiftKey&&!e.altKey){flash('p2',['e.Modifiers == Keys.Control','textBox2.Focus']);if($('#p2t2').style.visibility==='hidden'){say('p2o','Ctrl detected, but textBox2 is invisible right now, so Focus() has no effect.',1)}else{$('#p2t2').focus();say('p2o','Ctrl detected: <code>e.Modifiers == Keys.Control</code>, so focus moved to textBox2.')}}});
+const run=()=>{clearInterval(timer);if($('#p2en').checked)timer=setInterval(()=>{tk++;const t=$('#p2t2');t.style.visibility=t.style.visibility==='hidden'?'visible':'hidden';st()},+$('#p2iv').value);else $('#p2t2').style.visibility='visible'};
+$('#p2en').onchange=run;$('#p2iv').oninput=()=>{$('#p2ivv').textContent=$('#p2iv').value;run()};run();}});
+
+add({id:'p3',nav:'Practical 3',tag:'Escapes',title:'Practical 3: Escape characters and the ternary operator',
+lead:'Escape sequences put tabs, new lines and quotes inside a string. The ternary operator picks one of two values in a single line.',
+body:()=>`<div class="split"><div>${win('Week4',`
+<div class="row"><label for="p3a">Age</label><input id="p3a" type="text" value="12" size="8"><button id="p3b">Ok</button></div>
+<pre class="rtb" id="p3r"></pre>`)}${out('p3o','Enter an age and press Ok.')}
+<div class="panel"><h3 style="margin-top:0">Escape playground</h3><p>Type the inside of a C# string literal. The box shows what the user would see.</p>
+<input id="p3e" type="text" style="width:100%">
+<pre class="rtb" id="p3eo" style="margin-top:8px"></pre></div></div>${codeBox('p3','Week4.cs',C.p3)}</div>
+<div class="notes"><h2>Reference</h2><div class="tbl"><table><thead><tr><th>Sequence</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>\\n</code></td><td>New line</td></tr><tr><td><code>\\t</code></td><td>Tab</td></tr><tr><td><code>\\"</code></td><td>Double quote</td></tr><tr><td><code>\\'</code></td><td>Single quote</td></tr><tr><td><code>\\\\</code></td><td>Backslash</td></tr><tr><td><code>\\r</code></td><td>Carriage return</td></tr></tbody></table></div>
+<p><code>(a &lt; 13) ? "Child" : "Adult"</code> means: if a &lt; 13 then "Child", otherwise "Adult". <code>Convert.ToInt32(null)</code> returns 0, but empty or non-numeric text still throws <code>FormatException</code>.</p>
+${selfTest([['Extend the ternary to Child / Teen / Adult.','<code>string s = (a &lt; 13) ? "Child" : (a &lt; 20) ? "Teen" : "Adult";</code>'],['What does 13 give?','Adult, because 13 &lt; 13 is false.']])}</div>`,
+init(){const unesc=t=>t.replace(/\\(.)/g,(m,c)=>({n:'\n',t:'\t','"':'"',"'":"'",'\\':'\\',r:'',0:''}[c]??m));
+$('#p3e').value=String.raw`He said \"Hi\"\nName:\tRavi`;const pe=()=>{$('#p3eo').textContent=unesc($('#p3e').value)};$('#p3e').oninput=pe;pe();
+$('#p3b').onclick=()=>{$('#p3r').textContent=unesc(String.raw`Name\t\tMobile\t\tAge\n\"Kumar\"\t\t07788995\t23\nRavi\t\t0785432\t\t24`);flash('p3',['richTextBox1.Text','"Name','Convert.ToInt32','? "Child"','txtAge.Text = s']);
+try{const a=parseInt32($('#p3a').value);const s=a<13?'Child':'Adult';say('p3o',`a = ${a}; (${a} &lt; 13) is <b>${a<13}</b>, so s = "${s}".`);$('#p3a').value=s}catch(x){say('p3o','Convert.ToInt32 threw System.'+x+' Press Ok again after typing a number.',1)}};}});
+
+add({id:'p4',nav:'Practical 4',tag:'Animation',title:'Practical 4: Bouncing ball with Timer and TrackBar',
+lead:'Every Tick the ball moves 10 px across and 10 px down. At an edge it snaps back inside and flips direction. The TrackBar sets Interval = 305 − Value.',
+body:()=>`<div class="split"><div>${win('Week4Ball',`
+<div class="row"><label for="p4v">speedcontrol</label><input type="range" id="p4v" min="0" max="300" value="200"><span class="mono" id="p4iv"></span></div>
+<div class="fig"><canvas id="p4c" width="600" height="340" aria-label="Bouncing ball form"></canvas></div>
+<div class="row" style="margin-top:10px"><button id="p4go" class="pri">Pause</button><button id="p4st">Single Tick</button><label><input type="checkbox" id="p4tr"> Show trail</label></div>`)}
+<div class="status" id="p4s"></div></div>${codeBox('p4','Week4Ball.cs',C.p4)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li><code>HD</code> and <code>VD</code> are fields, so the direction is remembered between ticks.</li>
+<li>Right edge of the ball = <code>Left + Width</code>; bottom edge = <code>Top + Height</code>.</li>
+<li>TrackBar 0 → Interval 305 ms (slow); 300 → 5 ms (fast). Interval can never be 0, which would throw an exception.</li>
+<li>In the real form, <code>this.Width</code> includes the borders; <code>ClientSize.Width</code> is the drawable area.</li></ul>
+${selfTest([['How do you make the ball move only horizontally?','Remove the whole VD block from timer1_Tick.'],['What Interval does TrackBar value 105 give?','305 − 105 = 200 ms.']])}</div>`,
+init(){const c=$('#p4c'),g=c.getContext('2d');const W=c.width,H=c.height,B=40;let L=80,T=30,HD='F',VD='D',run=!matchMedia('(prefers-reduced-motion: reduce)').matches,tm=null,n=0;
+const iv=()=>305-(+$('#p4v').value);
+const draw=()=>{if(!$('#p4tr').checked){g.fillStyle='#f0f0f0';g.fillRect(0,0,W,H)}const cx=L+B/2,cy=T+B/2;g.fillStyle='#fff';g.strokeStyle='#111827';g.lineWidth=2;g.beginPath();g.arc(cx,cy,B/2-1,0,7);g.fill();g.stroke();g.fillStyle='#111827';g.beginPath();for(let k=0;k<5;k++){const a=k*1.2566+n*.2;g.moveTo(cx+Math.cos(a)*8,cy+Math.sin(a)*8);g.arc(cx+Math.cos(a)*8,cy+Math.sin(a)*8,3.5,0,7)}g.fill();
+$('#p4s').textContent=`ball.Left = ${L}  ball.Top = ${T}  HD = "${HD}"  VD = "${VD}"  this.Width = ${W}  this.Height = ${H}`};
+const tick=()=>{n++;const hl=[];if(HD==='F'){if(B+L+10>W){L=W-B;HD='B';hl.push('HD = "B"')}else{L+=10;hl.push('else ball.Left += 10')}}else{if(L-10<0){L=0;HD='F';hl.push('HD = "F"')}else{L-=10;hl.push('else ball.Left -= 10')}}
+if(VD==='D'){if(T+B+10>H){T=H-B;VD='U';hl.push('VD = "U"')}else{T+=10;hl.push('else ball.Top += 10')}}else{if(T-10<0){T=0;VD='D';hl.push('VD = "D"')}else{T-=10;hl.push('else ball.Top -= 10')}}
+if(hl.some(h=>h.includes('"')))flash('p4',hl);draw()};
+const loop=()=>{clearTimeout(tm);if(run){tick();tm=setTimeout(loop,iv())}};
+const upd=()=>{$('#p4iv').textContent=`timer1.Interval = 305 − ${$('#p4v').value} = ${iv()} ms`};
+$('#p4v').oninput=()=>{upd();flash('p4',['timer1.Interval = 305'])};upd();
+$('#p4go').onclick=()=>{run=!run;$('#p4go').textContent=run?'Pause':'Start';loop()};$('#p4go').textContent=run?'Pause':'Start';
+$('#p4st').onclick=()=>{run=false;$('#p4go').textContent='Start';clearTimeout(tm);tick()};
+g.fillStyle='#f0f0f0';g.fillRect(0,0,W,H);draw();loop();}});
+
+add({id:'p5',nav:'Practical 5',tag:'Loops & bases',title:'Practical 5: switch, loops, number bases and key validation',
+lead:'Four mini-labs on one form. Each control triggers the matching handler on the right.',
+body:()=>`<div class="split"><div>${win('Week5',`
+<div class="grid2">
+<fieldset><legend>switch</legend><div class="row"><label for="p5w">Week Number</label><select id="p5w"><option value="-1">(none)</option>${[0,1,2,3,4,5,6].map(i=>`<option>${i}</option>`).join('')}</select></div><div class="row"><label for="p5wn">Week Name</label><input id="p5wn" type="text" readonly size="12"></div></fieldset>
+<fieldset><legend>Loops</legend><div class="row"><button id="p5for">For Loop</button><button id="p5wh">While Loop</button></div><div class="chips" id="p5ch"></div></fieldset>
+</div>
+<fieldset style="margin-top:12px"><legend>Base Selection</legend>
+<div class="row"><label class="rad"><input type="radio" name="p5b" value="2" checked> Decimal To Binary</label><label class="rad"><input type="radio" name="p5b" value="8"> Decimal to Octal</label><label class="rad"><input type="radio" name="p5b" value="o"> Other</label><input type="number" id="p5nu" min="2" max="16" value="16" style="width:72px;display:none" aria-label="numericUpDown1"></div>
+<div class="row"><label for="p5d">Decimal Number</label><input id="p5d" type="text" value="13" size="10"><button id="p5db">Convert to Binary</button></div>
+<div class="row"><label for="p5bn" id="p5lr">Binary Number</label><input id="p5bn" type="text" size="14"><button id="p5bd">Binary to Decimal</button></div>
+<div id="p5tr" class="tbl"></div></fieldset>
+<fieldset style="margin-top:12px"><legend>KeyPress validation</legend>
+<div class="row"><label for="p5fn">Full Name</label><input id="p5fn" type="text" placeholder="letters only, auto CAPS" style="flex:1"></div>
+<div class="row"><label for="p5sal">Salary</label><input id="p5sal" type="text" placeholder="digits and one dot" style="flex:1"></div></fieldset>`)}${out('p5o','Pick a week number, run a loop, convert a number or type in the validated boxes.')}</div>${codeBox('p5','Week5.cs',C.p5)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li><code>SelectedIndex</code> is 0-based and is −1 when nothing is selected, which reaches <code>default</code>.</li>
+<li><code>for</code> and <code>while</code> test first; <code>do…while</code> runs once before testing. <code>i++</code> shows the old value, so the do loop shows 0–9.</li>
+<li>Repeated division: remainder <code>%</code> gives the next digit from the right; <code>b = bit + b</code> puts it in front.</li>
+<li>The handout's "Other" option shows the NumericUpDown but never sets <code>basenum</code>. This lab applies the fix <code>basenum = (int)numericUpDown1.Value</code> and shows where digits above 9 go wrong.</li>
+<li><code>'a'</code> = 97 and <code>'A'</code> = 65, so subtracting 32 makes a capital. <code>(char)8</code> is Backspace; <code>e.KeyChar = (char)0</code> rejects the key (modern code: <code>e.Handled = true</code>).</li></ul>
+${selfTest([['Convert 45 to binary and octal.','101101₂ and 55₈.'],['What does the converter output for 0?','An empty string, because the while loop never runs. Fix: <code>if (b == "") b = "0";</code>']])}</div>`,
+init(){const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];let base=2;
+$('#p5w').onchange=()=>{const i=+$('#p5w').value;const v=i>=0&&i<7?days[i]:'Invalid Index';$('#p5wn').value=v;flash('p5',[i>=0?`case ${i}:`:'default:','switch (comboBox1.SelectedIndex)']);say('p5o',`SelectedIndex = ${i} → ${i>=0?`case ${i}`:'default'} → "${v}"`)};
+let busy=0;const seq=(arr,keys,label)=>{if(busy)return;busy=1;const ch=$('#p5ch');ch.innerHTML='';flash('p5',keys);let k=0;const st=()=>{if(k>=arr.length){busy=0;say('p5o',label);return}ch.insertAdjacentHTML('beforeend',`<span class="chip">${arr[k++]}</span>`);setTimeout(st,180)};st()};
+$('#p5for').onclick=()=>seq([10,9,8,7,6,5,4,3,2,1,'The End'],['for (int i = 10','MessageBox.Show(i.ToString())','"The End"'],'for: i starts at 10 and counts down while i &gt; 0, then "The End". Each chip is one MessageBox.');
+$('#p5wh').onclick=()=>seq([0,1,2,3,4,5,6,7,8,9],['do','MessageBox.Show((i++)','while (i < 10)'],'do…while: shows i, then increments; stops when i reaches 10. The body always runs at least once.');
+const setBase=()=>{const v=$$('[name=p5b]').find(r=>r.checked).value;$('#p5nu').style.display=v==='o'?'inline-block':'none';base=v==='o'?Math.min(16,Math.max(2,+$('#p5nu').value||2)):+v;
+const nm={2:'Binary',8:'Octal'}[base]||('Base '+base);$('#p5lr').textContent=nm+' Number';$('#p5db').textContent='Convert to '+nm;
+flash('p5',v==='2'?['basenum = 2','"Convert to Binary"']:v==='8'?['basenum = 8','"Convert To Octal"']:['numericUpDown1.Visible = true'])};
+$$('[name=p5b]').forEach(r=>r.onchange=setBase);$('#p5nu').oninput=setBase;
+$('#p5db').onclick=()=>{flash('p5',['bit = d % basenum','d = d / basenum','b = bit + b']);let d;try{d=parseInt32($('#p5d').value)}catch(x){say('p5o','System.'+x,1);return}
+const rows=[];let b='',fixd='',dd=d;while(dd>0){const bit=dd%base,q=Math.trunc(dd/base);b=bit+b;fixd='0123456789ABCDEF'[bit]+fixd;rows.push([dd,bit,q,b]);dd=q}
+$('#p5bn').value=b;$('#p5tr').innerHTML=rows.length?`<table><thead><tr><th>d</th><th>d % ${base}</th><th>d / ${base}</th><th>b</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="num">${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td><td class="mono">${r[3]}</td></tr>`).join('')}</tbody></table>`:'';
+say('p5o',d<=0?'The loop never ran (d is not greater than 0), so b stays an empty string.':`${d}₁₀ = <b>${fixd}</b> in base ${base}.`+(b!==fixd?` The handout code writes <code>${b}</code> because it adds remainders above 9 as two-digit numbers; use A–F for 10–15.`:''),d<=0)};
+$('#p5bd').onclick=()=>{flash('p5',['Substring(j++, 1).Equals("1")','Math.Pow(2, i - 1)']);const s=$('#p5bn').value;let d=0,i=s.length,j=0;const rows=[];while(i>0){const ch=s.substr(j++,1),add=ch==='1'?2**(i-1):0;d+=add;rows.push([ch,i-1,add,d]);i--}
+$('#p5d').value=d;$('#p5tr').innerHTML=`<table><thead><tr><th>digit</th><th>power</th><th>adds</th><th>d</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="mono">${esc(r[0])}</td><td class="num">2^${r[1]}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody></table>`;say('p5o',`"${esc(s)}" → ${d}. Any character other than "1" adds 0, so this method only reads binary.`)};
+$('#p5fn').addEventListener('keydown',e=>{if(e.key.length!==1||e.ctrlKey||e.metaKey)return;const c=e.key;flash('p5',['textBox2_KeyPress']);if(/[a-zA-Z ]/.test(c)){if(/[a-z]/.test(c)){e.preventDefault();const t=e.target,p=t.selectionStart;t.setRangeText(c.toUpperCase(),p,t.selectionEnd,'end');flash('p5',['e.KeyChar - 32']);say('p5o',`'${c}' (${c.charCodeAt(0)}) − 32 = ${c.charCodeAt(0)-32} = '${c.toUpperCase()}'`)}}else{e.preventDefault();flash('p5',['e.KeyChar = (char)0;  // Null']);say('p5o',`'${esc(c)}' rejected: Invalid Character Pressed`,1)}});
+$('#p5sal').addEventListener('keydown',e=>{if(e.key.length!==1||e.ctrlKey||e.metaKey)return;const c=e.key;if(/[0-9]/.test(c))return;if(c==='.'){if(e.target.value.includes('.')){e.preventDefault();flash('p5',['More than one decimal']);say('p5o','More than one decimal will not be accepted',1)}return}e.preventDefault();flash('p5',['textBox3_KeyPress','Invalid Character Pressed']);say('p5o',`'${esc(c)}' rejected: Invalid Character Pressed`,1)});}});
+
+add({id:'p6',nav:'Practical 6',tag:'Arrays',title:'Practical 6: Arrays, Array.Sort and Array.Reverse',
+lead:'Step through the button handler one statement at a time and watch the array change.',
+body:()=>`<div class="split"><div>${win('Week6',`
+<div class="row"><label for="p6in">Values</label><input id="p6in" type="text" value="Volvo, BMW, Toyota, Mazda, Suzuki" style="flex:1"></div>
+<div class="row"><label for="p6i">Reverse(</label><span class="mono">cars,</span><input id="p6i" type="number" value="0" min="0" style="width:64px" aria-label="index"><span class="mono">,</span><input id="p6n" type="number" value="2" min="0" style="width:64px" aria-label="length"><span class="mono">)</span></div>
+<div class="row"><button id="p6s1">1. Declare</button><button id="p6s2">2. Array.Sort</button><button id="p6s3">3. Array.Reverse</button><button id="p6s4" class="pri">4. Items.AddRange</button></div>
+<div class="cells" id="p6cells"></div>
+<div class="grid2"><div><label>listBox1</label><div class="lst" id="p6lb"></div></div><div><label for="p6cb">comboBox1</label><br><select id="p6cb" style="width:100%"></select></div></div>`)}${out('p6o','Start with step 1.')}</div>${codeBox('p6','Week6.cs',C.p6)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li>After sorting: BMW, Mazda, Suzuki, Toyota, Volvo. <code>Reverse(cars, 0, 2)</code> swaps only the first two: Mazda, BMW, Suzuki, Toyota, Volvo.</li>
+<li><code>Reverse(array, index, length)</code> throws <code>ArgumentException</code> when index + length is past the end.</li>
+<li>Clicking AddRange twice adds the items twice. Call <code>comboBox1.Items.Clear()</code> first.</li>
+<li><code>Array</code> lives in <code>System</code>; the handout listing needs <code>using System;</code>.</li></ul>
+${selfTest([['What does Reverse(cars, 2, 3) do to the sorted array?','BMW, Mazda, Volvo, Toyota, Suzuki.'],['Print each car with foreach.','<code>foreach (string c in cars) listBox1.Items.Add(c);</code>']])}</div>`,
+init(){let arr=[],prev=[];const show=mv=>{$('#p6cells').innerHTML=arr.map((v,i)=>`<div class="cell ${mv&&prev[i]!==v?'mv':''}"><small>[${i}]</small>${esc(v)}</div>`).join('')};
+$('#p6s1').onclick=()=>{arr=$('#p6in').value.split(',').map(s=>s.trim()).filter(Boolean);prev=arr.slice();show();flash('p6',['string[] cars']);say('p6o',`cars.Length = ${arr.length}. Indexes run from 0 to ${arr.length-1}.`)};
+$('#p6s2').onclick=()=>{if(!arr.length)$('#p6s1').click();prev=arr.slice();arr.sort((a,b)=>a.localeCompare(b,'en'));show(1);flash('p6',['Array.Sort']);say('p6o','Sorted alphabetically, in place. Highlighted cells moved.')};
+$('#p6s3').onclick=()=>{if(!arr.length)$('#p6s1').click();const i=+$('#p6i').value,n=+$('#p6n').value;flash('p6',['Array.Reverse']);if(i<0||n<0||i+n>arr.length){say('p6o',`System.ArgumentException: index ${i} + length ${n} is past the end of an array of ${arr.length}.`,1);return}prev=arr.slice();const part=arr.slice(i,i+n).reverse();arr.splice(i,n,...part);show(1);say('p6o',`Reversed ${n} element(s) starting at index ${i}.`)};
+$('#p6s4').onclick=()=>{if(!arr.length)$('#p6s1').click();flash('p6',['Items.AddRange']);arr.forEach(v=>{$('#p6cb').add(new Option(v));$('#p6lb').insertAdjacentHTML('beforeend',`<div>${esc(v)}</div>`)});say('p6o',`Added ${arr.length} items. comboBox1 now holds ${$('#p6cb').options.length}.`)};
+$('#p6s1').click();}});
+
+add({id:'p7',nav:'Practical 7',tag:'Strings',title:'Practical 7: String methods',
+lead:'Type any text and press the button to run every line of the handler, or test single methods with your own arguments.',
+body:()=>`<div class="split"><div>${win('week7',`
+<div class="row"><input id="p7t" type="text" value="apple pie" style="flex:1" aria-label="textBox1"><button id="p7b" class="pri">button1</button></div>
+<div class="grid2"><div><label>listBox1</label><div class="lst" id="p7lb"></div></div><div><label>richTextBox1</label><pre class="rtb" id="p7rt" style="max-height:180px"></pre></div></div>`)}
+<div class="tbl" id="p7res"></div>
+<div class="panel"><h3 style="margin-top:0">Method tester</h3>
+<div class="row"><label for="p7s">s =</label><input id="p7s" type="text" value="Visual Programming" style="flex:1"></div>
+<div class="row"><select id="p7m" aria-label="Method"><option>Substring</option><option>IndexOf</option><option>Replace</option><option>PadRight</option><option>PadLeft</option><option>Split</option><option>ToUpper</option><option>Trim</option><option>Contains</option></select><input id="p7a1" type="text" value="7" size="6" aria-label="argument 1"><input id="p7a2" type="text" value="4" size="6" aria-label="argument 2"></div>
+<div class="out" id="p7mo"></div></div></div>${codeBox('p7','week7.cs',C.p7)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li>Strings are immutable: <code>s.Replace(...)</code> returns a new string; <code>s</code> is unchanged unless reassigned.</li>
+<li><code>Substring(0, 0)</code> is the empty string, so the loop safely runs from 0 up to and including <code>s.Length</code>.</li>
+<li>On an empty TextBox, <code>myString[0]</code> throws <code>IndexOutOfRangeException</code>.</li>
+<li><code>IndexOf("is", 15)</code> returns −1: the only "is" in the sentence is at index 9.</li></ul>
+${selfTest([['"Visual Programming".Substring(7, 4)?','"Prog"'],['Count the words in textBox1.','<code>textBox1.Text.Split(new[] {\' \'}, StringSplitOptions.RemoveEmptyEntries).Length</code>']])}</div>`,
+init(){$('#p7b').onclick=async()=>{const t=$('#p7t').value;flash('p7',['Split','AddRange']);$('#p7lb').innerHTML=t.split(' ').map(w=>`<div>${esc(w)||'&nbsp;'}</div>`).join('');
+if(!t.length){say;$('#p7res').innerHTML='';msg('System.IndexOutOfRangeException: Index was outside the bounds of the array.','Unhandled exception');return}
+let rt='';for(let i=0;i<=t.length;i++)rt+=t.substring(0,i)+'\n';$('#p7rt').textContent=rt;
+const S='Computer is an electronic information processing machine';const pad=t.length>=20?t:t+'#'.repeat(20-t.length);
+const rows=[['Split(\' \')',`${t.split(' ').length} item(s) in listBox1`],['First / last letter',`${t[0]} / ${t[t.length-1]}`],['Substring loop',`${t.length+1} lines in richTextBox1`],['Replace("p", "b")',t.split('p').join('b')],['PadRight(20, \'#\')',pad],['IndexOf("is")',S.indexOf('is')],['IndexOf("is", 15)',S.indexOf('is',15)]];
+$('#p7res').innerHTML=`<table><thead><tr><th>Statement</th><th>Result</th></tr></thead><tbody>${rows.map(r=>`<tr><td><code>${esc(r[0])}</code></td><td class="mono">${esc(r[1])}</td></tr>`).join('')}</tbody></table>`;
+await msg(`First letter of your text is ${t[0]} and the last letter is ${t[t.length-1]}`);flash('p7',['Replace("p", "b")']);await msg(t.split('p').join('b'));flash('p7',['PadRight']);await msg(pad);flash('p7',['IndexOf("is").ToString']);await msg(String(S.indexOf('is')));flash('p7',['IndexOf("is", 15)']);await msg(String(S.indexOf('is',15)))};
+const run=()=>{const s=$('#p7s').value,m=$('#p7m').value,a=$('#p7a1').value,b=$('#p7a2').value;let r,call;try{const n=x=>{if(!/^-?\d+$/.test(x))throw'FormatException';return+x};
+switch(m){case'Substring':{const i=n(a),l=b===''?s.length-i:n(b);call=`s.Substring(${a}${b===''?'':', '+b})`;if(i<0||l<0||i+l>s.length)throw'ArgumentOutOfRangeException: startIndex + length is past the end of the string';r=JSON.stringify(s.substr(i,l));break}
+case'IndexOf':{const st=b===''?0:n(b);call=`s.IndexOf("${a}"${b===''?'':', '+b})`;if(st<0||st>s.length)throw'ArgumentOutOfRangeException';r=s.indexOf(a,st);break}
+case'Replace':call=`s.Replace("${a}", "${b}")`;if(!a)throw'ArgumentException: String cannot be of zero length';r=JSON.stringify(s.split(a).join(b));break;
+case'PadRight':case'PadLeft':{const w=n(a),c=(b||' ')[0];call=`s.${m}(${a}, '${c}')`;const f=Math.max(0,w-s.length);r=JSON.stringify(m==='PadRight'?s+c.repeat(f):c.repeat(f)+s);break}
+case'Split':{const c=(a||' ')[0];call=`s.Split('${c}')`;r=JSON.stringify(s.split(c));break}
+case'ToUpper':call='s.ToUpper()';r=JSON.stringify(s.toUpperCase());break;
+case'Trim':call='s.Trim()';r=JSON.stringify(s.trim());break;
+case'Contains':call=`s.Contains("${a}")`;r=s.includes(a);break}
+say('p7mo',`<code>${esc(call)}</code> → <b class="mono">${esc(r)}</b>`)}catch(x){say('p7mo','System.'+esc(x),1)}};
+const hint={Substring:['7','4'],IndexOf:['Pro',''],Replace:['m','M'],PadRight:['25','*'],PadLeft:['25','.'],Split:[' ',''],ToUpper:['',''],Trim:['',''],Contains:['Visual','']};
+$('#p7m').onchange=()=>{[$('#p7a1').value,$('#p7a2').value]=hint[$('#p7m').value];run()};['#p7s','#p7a1','#p7a2'].forEach(s=>$(s).oninput=run);run();}});
+
+add({id:'w8',nav:'Week 8 theory',tag:'Graphics',title:'Week 8: Graphics, Pen and the coordinate system',
+lead:'The Graphics object is the paper and the Pen is the pencil. The origin (0, 0) is the top-left corner; x grows right and y grows down.',
+body:()=>`<div class="split"><div>${win('Form1 – Paint',`
+<div class="row"><select id="w8m" aria-label="Method"><option>DrawLine</option><option>DrawEllipse</option><option>DrawRectangle</option><option>FillEllipse</option><option>FillRectangle</option></select>
+<label for="w8c">Color</label><input type="color" id="w8c" value="#000000" aria-label="Pen color" style="width:44px;height:34px"><label for="w8w">Width</label><input type="range" id="w8w" min="1" max="12" value="3" style="width:100px"></div>
+<div class="fig"><svg id="w8s" viewBox="-40 -30 520 380" style="width:100%;background:#fff;border:1px solid #b8c0cf;touch-action:none" aria-label="Coordinate plane"></svg></div>
+<div class="grid2" id="w8sl" style="margin-top:10px"></div>`)}<div class="out mono" id="w8code"></div><p class="status">Tip: click or drag on the plane to move the first point (or the top-left corner).</p></div>
+<div><div class="panel" style="margin-top:0"><h3 style="margin-top:0">Graphics methods</h3><div class="tbl"><table><thead><tr><th>Method</th><th>Parameters</th></tr></thead><tbody>
+<tr><td><code>DrawLine</code></td><td>pen, x1, y1, x2, y2</td></tr><tr><td><code>DrawRectangle</code></td><td>pen, x, y, width, height</td></tr><tr><td><code>DrawEllipse</code></td><td>pen, x, y, width, height of the bounding rectangle</td></tr><tr><td><code>DrawArc</code></td><td>pen, x, y, width, height, startAngle, sweepAngle</td></tr><tr><td><code>DrawPolygon</code>, <code>DrawClosedCurve</code></td><td>pen, Point[]</td></tr><tr><td><code>FillEllipse</code>, <code>FillRectangle</code></td><td>brush, x, y, width, height</td></tr></tbody></table></div></div>
+${codeBox('w8','Lecture examples',String.raw`public void DrawLineInt(PaintEventArgs e)
+{
+    // Create a black pen with thickness 3.
+    Pen blackPen = new Pen(Color.Black, 3);
+    int x1 = 100, y1 = 100;
+    int x2 = 500, y2 = 100;
+    e.Graphics.DrawLine(blackPen, x1, y1, x2, y2);
+}
+
+private void DrawEllipseInt(PaintEventArgs e)
+{
+    Pen blackPen = new Pen(Color.Black, 3);
+    int x = 0, y = 0;
+    int width = 200, height = 100;
+    e.Graphics.DrawEllipse(blackPen, x, y, width, height);
+}
+
+private void Form1_Paint(object sender, PaintEventArgs e)
+{
+    DrawLineInt(e);
+    DrawEllipseInt(e);
+}`)}</div></div>
+<div class="notes"><h2>Key ideas</h2><ul>
+<li><b>Pen</b> has <code>Color</code> and <code>Width</code>: <code>new Pen(Color.Black, 3)</code>. <b>Brush</b> fills: <code>new SolidBrush(Color.Red)</code>.</li>
+<li>An ellipse is drawn inside an invisible bounding rectangle (dashed above). For a circle of radius r at (cx, cy): <code>DrawEllipse(pen, cx - r, cy - r, 2*r, 2*r)</code>.</li>
+<li>Drawing in the <code>Paint</code> event survives minimising; drawing through <code>CreateGraphics()</code> does not.</li>
+<li>The lecture figure draws from (75, 75) to (275, 275). The slide text "x1 = y2 = 75" should read x1 = y1 = 75.</li></ul>
+${selfTest([['Draw a red vertical line width 2 from (50, 20) to (50, 220).','<code>g.DrawLine(new Pen(Color.Red, 2), 50, 20, 50, 220);</code>'],['Circle of radius 40 centred at (150, 150)?','<code>g.DrawEllipse(pen, 110, 110, 80, 80);</code>']])}</div>`,
+init(){const S=$('#w8s');const P={x1:75,y1:75,x2:275,y2:275,x:60,y:50,w:200,h:100};
+const sl=()=>{const line=$('#w8m').value==='DrawLine';const keys=line?[['x1',400],['y1',300],['x2',400],['y2',300]]:[['x',400],['y',300],['w',400],['h',300]];
+$('#w8sl').innerHTML=keys.map(([k,mx])=>`<label class="row" style="margin:0"><span class="mono" style="width:60px">${k==='w'?'width':k==='h'?'height':k}</span><input type="range" data-k="${k}" min="0" max="${mx}" value="${P[k]}"><b class="mono" id="w8v${k}">${P[k]}</b></label>`).join('');
+$$('#w8sl input').forEach(i=>i.oninput=()=>{P[i.dataset.k]=+i.value;draw()})};
+const draw=()=>{const m=$('#w8m').value,col=$('#w8c').value,pw=+$('#w8w').value;let g='';
+for(let x=0;x<=400;x+=50)g+=`<line x1="${x}" y1="0" x2="${x}" y2="300" stroke="#eef0f5"/><text x="${x}" y="-10" font-size="11" text-anchor="middle" fill="#556070">${x}</text>`;
+for(let y=0;y<=300;y+=50)g+=`<line x1="0" y1="${y}" x2="400" y2="${y}" stroke="#eef0f5"/><text x="-8" y="${y+4}" font-size="11" text-anchor="end" fill="#556070">${y}</text>`;
+g+=`<line x1="0" y1="0" x2="440" y2="0" stroke="#111827" marker-end="url(#ar)"/><line x1="0" y1="0" x2="0" y2="335" stroke="#111827" marker-end="url(#ar)"/><text x="452" y="4" font-size="13" fill="#111827">x</text><text x="6" y="345" font-size="13" fill="#111827">y</text><circle r="4" fill="#1240e0"/><text x="8" y="16" font-size="12" fill="#1240e0">(0, 0)</text>`;
+let code;
+if(m==='DrawLine'){g+=`<line x1="${P.x1}" y1="${P.y1}" x2="${P.x2}" y2="${P.y2}" stroke="${col}" stroke-width="${pw}" stroke-linecap="round"/><circle cx="${P.x1}" cy="${P.y1}" r="5" fill="#1240e0"/><circle cx="${P.x2}" cy="${P.y2}" r="5" fill="#d81b60"/><text x="${P.x1+8}" y="${P.y1-8}" font-size="12">(x1, y1) = (${P.x1}, ${P.y1})</text><text x="${P.x2+8}" y="${P.y2+16}" font-size="12">(x2, y2) = (${P.x2}, ${P.y2})</text>`;
+code=`e.Graphics.DrawLine(new Pen(${cname(col)}, ${pw}), ${P.x1}, ${P.y1}, ${P.x2}, ${P.y2});`;flash('w8',['DrawLine(blackPen'])}
+else{const fill=m.startsWith('Fill');const shape=m.includes('Ellipse')?`<ellipse cx="${P.x+P.w/2}" cy="${P.y+P.h/2}" rx="${P.w/2}" ry="${P.h/2}"`:`<rect x="${P.x}" y="${P.y}" width="${P.w}" height="${P.h}"`;
+if(m.includes('Ellipse'))g+=`<rect x="${P.x}" y="${P.y}" width="${P.w}" height="${P.h}" fill="none" stroke="#9aa3b5" stroke-dasharray="5 4"/>`;
+g+=`${shape} ${fill?`fill="${col}"`:`fill="none" stroke="${col}" stroke-width="${pw}"`}/><circle cx="${P.x}" cy="${P.y}" r="5" fill="#1240e0"/><text x="${P.x+8}" y="${P.y-8}" font-size="12">(x, y) = (${P.x}, ${P.y})</text><text x="${P.x+P.w/2}" y="${P.y+P.h+16}" font-size="12" text-anchor="middle">width ${P.w} × height ${P.h}${m.includes('Ellipse')&&P.w===P.h?' → circle':''}</text>`;
+code=fill?`e.Graphics.${m}(new SolidBrush(${cname(col)}), ${P.x}, ${P.y}, ${P.w}, ${P.h});`:`e.Graphics.${m}(new Pen(${cname(col)}, ${pw}), ${P.x}, ${P.y}, ${P.w}, ${P.h});`;flash('w8',m.includes('Ellipse')?['DrawEllipse(blackPen']:[])}
+S.innerHTML=`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#111827"/></marker></defs>`+g;
+$('#w8code').innerHTML=hlLine(code);Object.keys(P).forEach(k=>{const e=$('#w8v'+k);if(e)e.textContent=P[k]});$$('#w8sl input').forEach(i=>i.value=P[i.dataset.k])};
+function cname(h){const n={'#000000':'Color.Black','#ff0000':'Color.Red','#0000ff':'Color.Blue','#008000':'Color.Green','#ffffff':'Color.White'}[h.toLowerCase()];if(n)return n;const v=parseInt(h.slice(1),16);return `Color.FromArgb(${v>>16&255}, ${v>>8&255}, ${v&255})`}
+const pt=e=>{const r=S.getBoundingClientRect();return[Math.round(Math.min(400,Math.max(0,(e.clientX-r.left)/r.width*520-40))),Math.round(Math.min(300,Math.max(0,(e.clientY-r.top)/r.height*380-30)))]};
+let drag=0;const mv=e=>{if(!drag)return;const[x,y]=pt(e);if($('#w8m').value==='DrawLine'){P.x1=x;P.y1=y}else{P.x=x;P.y=y}draw()};
+S.addEventListener('pointerdown',e=>{drag=1;mv(e)});addEventListener('pointerup',()=>drag=0);S.addEventListener('pointermove',mv);
+$('#w8m').onchange=()=>{sl();draw()};$('#w8c').oninput=draw;$('#w8w').oninput=draw;sl();draw();}});
+
+add({id:'p8',nav:'Practicals 8–9',tag:'Paint',title:'Practicals 8 and 9: Click-to-draw paint program',
+lead:'Left-click draws an outline; right-click fills (Practical 9). Size and pen width come from the two TrackBars.',
+body:()=>`<div class="split"><div>${win('Week8',`
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px" id="p8g">
+<div><fieldset><legend>Shape</legend>${['Line','Circle','Squre'].map((s,i)=>`<label class="rad"><input type="radio" name="p8s" value="${s}" ${i==1?'checked':''}> ${s==='Squre'?'Squre':s}</label>`).join('')}</fieldset>
+<div style="margin-top:10px"><span class="swatch" id="p8sw" role="button" tabindex="0" style="background:#1240e0">Choose Color</span><input type="color" id="p8c" value="#1240e0" style="position:absolute;opacity:0;width:1px;height:1px" aria-label="ColorDialog"></div>
+<div style="margin-top:10px"><label for="p8z">Size <b id="p8zv">40</b></label><input type="range" id="p8z" min="1" max="120" value="40" style="width:100%"></div>
+<div><label for="p8w">Pen width <b id="p8wv">3</b></label><input type="range" id="p8w" min="1" max="20" value="3" style="width:100%"></div>
+<label class="rad"><input type="checkbox" id="p8nine" checked> Practical 9 features</label>
+<label class="rad"><input type="checkbox" id="p8rb"> Treat taps as right-click</label>
+<button id="p8clr" style="width:100%;margin-top:6px">Clear</button></div>
+<div class="fig"><canvas id="p8c2" width="720" height="460" aria-label="Drawing surface: left-click outline, right-click fill"></canvas></div></div>`)}<div class="out mono" id="p8o">Click on the white area.</div></div>${codeBox('p8','Week8.cs',C.p8)}</div>
+<div class="notes"><h2>What to notice</h2><ul>
+<li>Subtracting <code>size / 2</code> from <code>e.X</code> and <code>e.Y</code> centres the shape on the click point.</li>
+<li><code>Draw…</code> methods use a Pen and draw outlines; <code>Fill…</code> methods use a Brush and ignore pen width. A line has no Fill version.</li>
+<li><code>ColorDialog.ShowDialog()</code> opens the standard colour picker; check <code>== DialogResult.OK</code> so Cancel keeps the old colour.</li>
+<li>Untick "Practical 9 features" to see the original Practical 8: right-click then draws the same outline and pen width stays 1.</li>
+<li>Clear is an extension: <code>g.Clear(this.BackColor);</code></li></ul>
+${selfTest([['How would you add a Triangle shape?','Build a <code>Point[]</code> of three corners around (e.X, e.Y) and call <code>g.DrawPolygon(pen, pts)</code> or <code>g.FillPolygon(brush, pts)</code>.'],['Why is drawing lost when the real form is minimised?','<code>CreateGraphics()</code> draws once; Windows does not repeat it. Draw in Paint or on a Bitmap to keep it.']])}</div>`,
+init(){const c=$('#p8c2'),g=c.getContext('2d');const clear=()=>{g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height)};clear();
+const z=()=>+$('#p8z').value,nine=()=>$('#p8nine').checked,pw=()=>nine()?+$('#p8w').value:1;
+$('#p8z').oninput=()=>{$('#p8zv').textContent=z();flash('p8',['size = trackBar1.Value'])};
+$('#p8w').oninput=()=>{$('#p8wv').textContent=$('#p8w').value;flash('p8',['pen.Width = trackBar2.Value'])};
+const pick=()=>$('#p8c').click();$('#p8sw').onclick=pick;$('#p8sw').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}};
+$('#p8c').oninput=()=>{$('#p8sw').style.background=$('#p8c').value;flash('p8',['label1.BackColor','pen.Color = cdlg.Color'])};
+$('#p8clr').onclick=()=>{clear();say('p8o','g.Clear(this.BackColor);')};
+c.addEventListener('contextmenu',e=>e.preventDefault());
+c.addEventListener('pointerdown',e=>{e.preventDefault();const r=c.getBoundingClientRect(),X=Math.round((e.clientX-r.left)/r.width*c.width),Y=Math.round((e.clientY-r.top)/r.height*c.height);
+const s=$$('[name=p8s]').find(i=>i.checked).value,sz=z(),h=Math.trunc(sz/2),right=e.button===2||$('#p8rb').checked,col=$('#p8c').value;g.strokeStyle=col;g.fillStyle=col;g.lineWidth=pw();let code;
+if(s==='Line'){g.beginPath();g.moveTo(X-h,Y);g.lineTo(X+h,Y);g.stroke();code=`g.DrawLine(pen, ${X-h}, ${Y}, ${X+h}, ${Y});`;flash('p8',['g.DrawLine'])}
+else{const fill=right&&nine(),el=s==='Circle';g.beginPath();if(el)g.ellipse(X,Y,sz/2,sz/2,0,0,7);else g.rect(X-h,Y-h,sz,sz);fill?g.fill():g.stroke();
+const m=(fill?'Fill':'Draw')+(el?'Ellipse':'Rectangle');code=`g.${m}(${fill?'new SolidBrush(pen.Color)':'pen'}, ${X-h}, ${Y-h}, ${sz}, ${sz});`;flash('p8',['g.'+m])}
+say('p8o',`MouseClick e.X = ${X}, e.Y = ${Y}, e.Button = ${right?'Right':'Left'}<br>${hlLine(code)}`)});
+$('#p8nine').onchange=()=>{$('#p8w').disabled=!nine()};
+/* sample drawing so the form opens mid-use */
+[[120,110,'Circle',60,0,'#1240e0',3],[250,180,'Squre',70,1,'#d81b60',3],[400,120,'Circle',50,1,'#0a7a3e',3],[520,260,'Squre',90,0,'#7a1fa2',4],[180,320,'Line',120,0,'#111827',5],[600,120,'Circle',80,0,'#e08a00',6]].forEach(([X,Y,s,sz,f,col,w])=>{g.strokeStyle=g.fillStyle=col;g.lineWidth=w;g.beginPath();const h=sz/2;if(s==='Line'){g.moveTo(X-h,Y);g.lineTo(X+h,Y);g.stroke();return}if(s==='Circle')g.ellipse(X,Y,h,h,0,0,7);else g.rect(X-h,Y-h,sz,sz);f?g.fill():g.stroke()});}});
+
+const QZ=[
+['What is the default event created when you double-click a Button in the designer?',['Click','MouseDown','Load','Enter'],0,'Double-clicking a control creates its default event; for a Button that is Click.'],
+['What is 28 << 2 in C#?',['56','112','7','30'],1,'Left shift by 2 multiplies by 2² = 4.'],
+['txtA.Text is "2" and txtB.Text is "3". What is txtA.Text + txtB.Text?',['5','"23"','Error','"5"'],1,'Both are strings, so + joins them. Parse first to add.'],
+['Which event gives you the typed character as e.KeyChar?',['KeyDown','KeyUp','KeyPress','TextChanged'],2,'KeyPressEventArgs has KeyChar; KeyDown gives KeyCode and Modifiers.'],
+['How do you test for the right mouse button in MouseDown?',['e.Button == MouseButtons.Right','e.Right == true','e.KeyCode == Keys.Right','e.Button == 2'],0,'e.Button is a MouseButtons value.'],
+['Which Timer property sets the time between Tick events?',['Delay','Enabled','Interval','Speed'],2,'Interval is in milliseconds; Enabled starts or stops the timer.'],
+['With a = 13, what does (a < 13) ? "Child" : "Adult" return?',['Child','Adult','13','Error'],1,'13 < 13 is false, so the second value is chosen.'],
+['Which loop always runs its body at least once?',['for','while','do…while','foreach'],2,'do…while checks its condition after the body.'],
+['What is 13 in binary?',['1011','1101','1110','1001'],1,'13 = 8 + 4 + 1.'],
+['After Array.Sort(cars) and Array.Reverse(cars, 0, 2) on Volvo, BMW, Toyota, Mazda, Suzuki, what is cars[0]?',['BMW','Volvo','Mazda','Suzuki'],2,'Sorted: BMW, Mazda, … Reversing the first two puts Mazda first.'],
+['"Computer is an electronic information processing machine".IndexOf("is", 15) returns',['9','−1','15','24'],1,'The only "is" is at index 9, before 15.'],
+['"PROGRAM".Substring(3, 3) returns',['"GRA"','"OGR"','"RAM"','"GRAM"'],0,'Start at index 3 (G) and take 3 characters.'],
+['In the GDI+ coordinate system, where is (0, 0) and which way does y grow?',['Bottom-left, up','Centre, up','Top-left, down','Top-left, up'],2,'The origin is the top-left of the client area; y increases downward.'],
+['In DrawEllipse(pen, x, y, width, height), what are x and y?',['The centre','The upper-left corner of the bounding rectangle','The radius','The lower-right corner'],1,'An ellipse is drawn inside a bounding rectangle.'],
+['What do you need to call FillEllipse?',['A Pen','A Brush such as SolidBrush','A ColorDialog','A Bitmap'],1,'Fill methods take a Brush; Draw methods take a Pen.'],
+['Shapes drawn with this.CreateGraphics() disappear when…',['the mouse moves','the form is minimised and restored','the pen colour changes','a TrackBar scrolls'],1,'Nothing redraws them; drawing in the Paint event would.'],
+['What does "\\t" insert in a string?',['A new line','A tab','A quote','Nothing'],1,'\\t is the tab escape sequence.'],
+['In Practical 4, what is timer1.Interval when the TrackBar value is 300?',['300 ms','305 ms','5 ms','0 ms'],2,'Interval = 305 − 300 = 5 ms, the fastest setting.']];
+add({id:'quiz',nav:'Quiz',tag:'18 Qs',title:'Quiz: test yourself on all nine practicals',lead:'Pick an answer to see the explanation. Your score updates as you go.',
+body:()=>`<div class="score"><span id="qzs">Score 0 / 0 answered</span><div class="bar"><i id="qzb" style="width:0"></i></div></div>${QZ.map((q,i)=>`<div class="qz" data-i="${i}"><b>${i+1}. ${esc(q[0])}</b><div class="opts">${q[1].map((o,j)=>`<button data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="why"></div></div>`).join('')}<button id="qzr">Reset quiz</button>`,
+init(){let ok=0,done=0;const upd=()=>{$('#qzs').textContent=`Score ${ok} / ${done} answered (of ${QZ.length})`;$('#qzb').style.width=done/QZ.length*100+'%'};
+$$('.qz').forEach(b=>{const q=QZ[b.dataset.i];$$('button',b).forEach(btn=>btn.onclick=()=>{if(b.dataset.a)return;b.dataset.a=1;done++;const j=+btn.dataset.j;if(j===q[2])ok++;else btn.classList.add('wrong');$$('button',b)[q[2]].classList.add('right');$('.why',b).textContent=(j===q[2]?'Correct. ':'Not quite. ')+q[3];upd()})});
+$('#qzr').onclick=()=>{ok=done=0;$$('.qz').forEach(b=>{delete b.dataset.a;$$('button',b).forEach(x=>x.className='');$('.why',b).textContent=''});upd()};}});
+
+const REF=[['Text → int','int n = int.Parse(txt.Text);'],['Safe parse','if (int.TryParse(txt.Text, out int n)) { … }'],['Number → text','n.ToString()'],['Message','MessageBox.Show("Hello");'],['Format','String.Format("{0} + {1}", a, b)'],['Mouse button','if (e.Button == MouseButtons.Right)'],['Mouse position','e.X, e.Y'],['Ctrl held','if (e.Modifiers == Keys.Control)'],['Reject a key','e.Handled = true;  // or e.KeyChar = (char)0;'],['Focus','textBox2.Focus();'],['Toggle visible','ctl.Visible = !ctl.Visible;'],['Timer','timer1.Interval = 100; timer1.Enabled = true;'],['Ternary','string s = (a < 13) ? "Child" : "Adult";'],['switch','switch (i) { case 0: …; break; default: …; break; }'],['Combo index','comboBox1.SelectedIndex'],['Fill a list','listBox1.Items.AddRange(arr);'],['Sort / reverse','Array.Sort(arr); Array.Reverse(arr, 0, 2);'],['Substring','s.Substring(start, length)'],['Search','s.IndexOf("is", 15)'],['Graphics','Graphics g = this.CreateGraphics();  // or e.Graphics in Paint'],['Pen','Pen pen = new Pen(Color.Black, 3);'],['Line','g.DrawLine(pen, x1, y1, x2, y2);'],['Circle at (cx, cy)','g.DrawEllipse(pen, cx - r, cy - r, 2 * r, 2 * r);'],['Filled square','g.FillRectangle(new SolidBrush(c), x, y, s, s);'],['Colour picker','ColorDialog d = new ColorDialog(); if (d.ShowDialog() == DialogResult.OK) pen.Color = d.Color;'],['Clear','g.Clear(this.BackColor);']];
+add({id:'ref',nav:'Cheat sheet',tag:'',title:'Cheat sheet: every snippet you need',lead:'Search the table, then copy a line with its button.',
+body:()=>`<div class="row"><input id="rfq" type="text" placeholder="Filter, e.g. Pen, parse, list" style="flex:1;max-width:420px" aria-label="Filter"></div><div class="tbl"><table><thead><tr><th>Need</th><th>Code</th><th></th></tr></thead><tbody id="rfb"></tbody></table></div>`,
+init(){const r=()=>{const q=$('#rfq').value.toLowerCase();$('#rfb').innerHTML=REF.filter(x=>(x[0]+x[1]).toLowerCase().includes(q)).map(x=>`<tr><td>${esc(x[0])}</td><td class="mono" style="overflow-wrap:anywhere">${hlLine(x[1])}</td><td><button data-c="${esc(x[1])}">Copy</button></td></tr>`).join('')||'<tr><td colspan="3">No match.</td></tr>';
+$$('#rfb button').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.c);b.textContent='Copied'}catch(e){b.textContent='Select it'}setTimeout(()=>b.textContent='Copy',1200)})};$('#rfq').oninput=r;r();}});
+
+/* ---------- router ---------- */
+$('#nav').innerHTML=MODS.map(m=>(m.id==='quiz'?'<div class="sep"></div>':'')+`<a href="#${m.id}" data-id="${m.id}">${m.nav}<small>${m.tag}</small></a>`).join('');
+$('#main').innerHTML=MODS.map(m=>`<section id="sec-${m.id}" hidden><h1>${m.title}</h1><p class="lead">${m.lead}</p>${m.body()}</section>`).join('');
+MODS.forEach(m=>{try{m.init&&m.init()}catch(e){console.error(m.id,e)}});
+const go=()=>{let id=location.hash.slice(1);if(!MODS.some(m=>m.id===id))id='home';MODS.forEach(m=>$('#sec-'+m.id).hidden=m.id!==id);$$('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.id===id));scrollTo(0,0)};
+addEventListener('hashchange',go);go();
+}
+</script>
+</body>
+</html>
